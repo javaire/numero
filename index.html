@@ -448,9 +448,20 @@
           const data = [{
             x:xArray,
             y:yArray,
-            type:"lines",
+            mode: 'lines+markers+text',
+            text: yArray,
             orientation:"v",
-            marker: {color:"rgba(0,0,255,0.6)"}
+            marker: {color:"rgba(0,0,255,0.6)"},
+            textposition: 'top',  // positions the text above the points
+            textfont: {
+              color: 'darkred',  // Font color
+            },
+            insidetextanchor: 'start',  // Align text inside the points
+            hoverinfo: 'none',  // Disable hover info to avoid conflict
+            textpadding: 10,  // Padding inside the background
+            line: {
+              dash: 'dot',
+            }
           }];
 
           const layout = {
@@ -459,7 +470,7 @@
                 automargin: true // Ensures the axis margin is adjusted
             },
             yaxis: {
-              range: [0, 9]
+              range: [0, 9.5]
             },
             title: {
                 text: `Graficul Energetic ${yArray.join("")}`,
