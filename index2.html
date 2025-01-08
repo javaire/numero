@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Numerologie</title>
+    <style>
+        body {
+            font-family: "Open Sans", verdana, arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        .title {
+          font-weight: normal;
+          font-size: 17px;
+          background: #e8ecee;
+          padding: 20px 0 0px 10px;
+          margin: 0;
+          border-top-left-radius: 5px;
+          border-top-right-radius: 5px;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .form-group label {
+            margin-right: 10px;
+            width: 110px;
+        }
+
+        .form-group input {
+            width: 300px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            text-transform: uppercase;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+
+        .form-group input::placeholder {
+          color: #666;
+          font-weight: normal;
+        }
+
+        .form-group button {
+            display: block;
+            margin-top: 10px;
+            padding: 10px 20px;
+            border: none;
+            background-color: #007BFF;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .form-group button:hover {
+            background-color: #0056b3;
+        }
+
+        .output {
+            padding: 10px;
+            background-color: #e9ecef;
+            border-bottom-left-radius: 5px;
+            border-bottom-right-radius: 5px;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+
+        .computed-name {
+          position: absolute;
+          left: -300px;
+          width: 280px;
+          text-align: right;
+          padding-top: 7px;
+        }
+
+        .grid {
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+
+        .cell {
+            width: 30px;
+            height: 30px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+            text-align: center;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .header-cell {
+            font-size: 10px;
+            background-color: #f0f0f0;
+        }
+
+        .bg-1 { background-color: #ffcccc; }
+        .bg-2 { background-color: #ccffcc; }
+        .bg-3 { background-color: #ccccff; }
+        .bg-4 { background-color: #ffffcc; }
+        .bg-5 { background-color: #ffccff; }
+        .bg-6 { background-color: #ccffff; }
+        .bg-7 { background-color: #ffcc99; }
+        .bg-8 { background-color: #99ccff; }
+        .bg-9 { background-color: #ff99cc; }
+
+        .date-group {
+            display: flex;
+            gap: 5px;
+        }
+
+        .date-group input {
+            width: 60px;
+        }
+
+        .date-group input:nth-child(3) {
+            width: 70px;
+        }
+
+        .tooltip {
+            visibility: hidden;
+            width: 15px;
+            background-color: #d1e7dd;
+            color: #000;
+            text-align: center;
+            border-radius: 4px;
+            padding: 2px;
+            position: absolute;
+            z-index: 1;
+            bottom: 27px;
+            left: 50%;
+            margin-left: -9.5px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 12px;
+        }
+
+        .cell:hover .tooltip {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .highlight {
+            background-color: #ffeb3b !important;
+        }
+
+        .highlight-tooltip .tooltip {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .past-year { background-color: #efefff; }
+        .current-year {
+          background-color: #f8d7da;
+          font-weight: bold
+        }
+        .future-year { background-color: #fbebfb; }
+
+        .sum-row {
+            background-color: #d1e7dd;
+        }
+
+        .reduced-sum-row {
+            background-color: #a7e2c7;
+        }
+
+        .plot {
+          width: 100%;
+          margin-top: 20px;
+          border-radius: 5px;
+          margin-bottom: 20px;
+        }
+
+        .js-plotly-plot .plotly .main-svg {
+          border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="form-group">
+            <label for="prenume1">Prenume</label>
+            <input type="text" id="prenume1" placeholder="Prenume 1" oninput="computeNumerology()" onkeypress="return isLetter(event)">
+            <input type="text" id="prenume2" placeholder="Prenume 2" oninput="computeNumerology()" onkeypress="return isLetter(event)">
+            <input type="text" id="prenume3" placeholder="Prenume 3" oninput="computeNumerology()" onkeypress="return isLetter(event)">
+        </div>
+        <div class="form-group">
+            <label for="nume">Nume</label>
+            <input type="text" id="nume" placeholder="Nume" oninput="computeNumerology()" onkeypress="return isLetter(event)">
+        </div>
+        <div class="form-group">
+            <label for="data-nasterii">Data nașterii</label>
+            <div class="date-group">
+                <input type="number" id="zi" placeholder="Zi" min="1" max="31" oninput="executeGraphic('energetic')">
+                <input type="number" id="luna" placeholder="Luna" min="1" max="12" oninput="executeGraphic('energetic')">
+                <input type="number" id="an" placeholder="An" min="1900" max="2100" oninput="computeNumerology(); executeGraphic('energetic')">
+            </div>
+        </div>
+
+        <h3 class="title">Numerologia numelui</h3>
+        <div class="output" id="output"></div>
+
+        <div class="plot" id="myPlot"></div>
+        <div class="plot" id="myPlot2"></div>
+    </div>
+
+    <script>
+        document.getElementById('prenume1').focus();
+
+        function computeNumerology() {
+            const prenume1 = document.getElementById('prenume1').value.toUpperCase();
+            const prenume2 = document.getElementById('prenume2').value.toUpperCase();
+            const prenume3 = document.getElementById('prenume3').value.toUpperCase();
+            const nume = document.getElementById('nume').value.toUpperCase();
+            const an = document.getElementById('an').value;
+
+            const output = document.getElementById('output');
+            output.innerHTML = '<p></p><div class="computed-name">Ani (Varsta)</div>';
+
+            if (an) {
+                output.innerHTML += `<div class="grid">${generateHeader(an)}</div>`;
+            } else {
+                output.innerHTML += `<div class="grid">${generateDefaultHeader()}</div>`;
+            }
+
+            if (prenume1) {
+                output.innerHTML += `<p></p><div class="computed-name"><b>${prenume1}</b></div><div class="grid">${formatName(prenume1)}</div>`;
+            }
+
+            if (prenume2) {
+                output.innerHTML += `<p></p><div class="computed-name"><b>${prenume2}</b></div><div class="grid">${formatName(prenume2)}</div>`;
+            }
+
+            if (prenume3) {
+                output.innerHTML += `<p></p><div class="computed-name"><b>${prenume3}</b></div><div class="grid">${formatName(prenume3)}</div>`;
+            }
+
+            if (nume) {
+                output.innerHTML += `<p></p><div class="computed-name"><b>${nume}</b></div><div class="grid">${formatName(nume)}</div>`;
+            }
+
+            if ((prenume1 || prenume2 || prenume3) && nume) {
+                const combinedValues = combineValues([prenume1, prenume2, prenume3, nume]);
+                output.innerHTML += `<p></p><div class="computed-name">Sumă cifre</div><div class="grid sum-row">${generateSumRow(combinedValues)}</div>`;
+                output.innerHTML += `<p></p><div class="computed-name">Sumă cifre comasate</div><div class="grid reduced-sum-row">${generateReducedSumRow(combinedValues)}</div>`;
+            }
+        }
+
+        function getRepeatCount(char) {
+            const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            const index = alphabet.indexOf(char.toUpperCase());
+            if (index === -1) return 1;
+            return (index % 9) + 1;
+        }
+
+        function formatName(name) {
+            let formattedName = '';
+            let totalLength = 0;
+
+            for (let i = 0; totalLength < 100; i++) {
+                const char = name[i % name.length];
+                const repeatCount = getRepeatCount(char);
+                const segment = char.repeat(repeatCount);
+
+                if (totalLength + segment.length > 100) {
+                    formattedName += char.repeat(100 - totalLength);
+                    break;
+                } else {
+                    formattedName += segment;
+                    totalLength += segment.length;
+                }
+            }
+
+            return formattedName.split('').map((char, index) => {
+                const repeatCount = getRepeatCount(char);
+                return `<div class="cell bg-${repeatCount}" onmouseover="highlightColumn(${index})" onmouseout="removeHighlight(${index})"><span class="tooltip">${repeatCount}</span>${char}</div>`;
+            }).join('');
+        }
+
+        function generateHeader(startYear) {
+            const currentYear = new Date().getFullYear();
+            let header = '';
+            for (let i = 0; i < 100; i++) {
+                const year = parseInt(startYear) + i;
+                let cellClass = 'header-cell';
+                if (year < currentYear) {
+                    cellClass += ' past-year';
+                } else if (year === currentYear) {
+                    cellClass += ' current-year';
+                } else {
+                    cellClass += ' future-year';
+                }
+                header += `<div class="cell ${cellClass}" onmouseover="highlightColumn(${i})" onmouseout="removeHighlight(${i})">${year}<br />${i}</div>`;
+            }
+            return header;
+        }
+
+        function generateDefaultHeader() {
+            let header = '';
+            for (let i = 1; i <= 100; i++) {
+                header += `<div class="cell header-cell" onmouseover="highlightColumn(${i - 1})" onmouseout="removeHighlight(${i - 1})">${i - 1}</div>`;
+            }
+            return header;
+        }
+
+        function combineValues(names) {
+            let combinedValues = new Array(100).fill(0);
+            let formattedNames = []
+
+            names.forEach((name, index) => {
+              if (name) {
+
+                let formattedName = '';
+                let totalLength = 0;
+                for (let i = 0; totalLength < 100; i++) {
+                    const char = name[i % name.length];
+                    const repeatCount = getRepeatCount(char);
+                    const segment = char.repeat(repeatCount);
+
+                    formattedNames[index] = []
+
+                    if (totalLength + segment.length > 100) {
+                        formattedName += char.repeat(100 - totalLength);
+                        formattedNames[index] = formattedName.split("")
+                        break;
+                    } else {
+                        formattedName += segment;
+                        formattedNames[index] = formattedName.split("")
+                        totalLength += segment.length;
+                    }
+                }
+
+                /*for (let i = 0; i < 100; i++) {
+                    const char = name[i % name.length];
+                    combinedValues[i] += getRepeatCount(char);
+                }*/
+              }
+            });
+
+            let sum = []
+            if (formattedNames.length) {
+              for (let i = 0; i < 100; i++) {
+                sum[i] = 0;
+                formattedNames.forEach(letters => {
+                  if (letters.length && letters[i]) {
+                    let currNumber = parseInt(getRepeatCount(letters[i]))
+                    sum[i] += currNumber
+                  }
+                })
+              }
+            }
+
+            return sum;
+        }
+
+        function generateSumRow(values) {
+            return values.map((value, index) => `<div class="cell" onmouseover="highlightColumn(${index})" onmouseout="removeHighlight(${index})">${value}</div>`).join('');
+        }
+
+        function generateReducedSumRow(values) {
+            return values.map((value, index) => {
+                let reducedValue = value;
+                while (reducedValue > 9) {
+                    reducedValue = reducedValue.toString().split('').reduce((acc, digit) => acc + parseInt(digit), 0);
+                }
+                return `<div class="cell" onmouseover="highlightColumn(${index})" onmouseout="removeHighlight(${index})">${reducedValue}</div>`;
+            }).join('');
+        }
+
+        function highlightColumn(index) {
+            const rows = document.querySelectorAll('.grid');
+            rows.forEach(row => {
+                const cells = row.children;
+                if (cells[index]) {
+                    cells[index].classList.add('highlight');
+                    cells[index].classList.add('highlight-tooltip');
+                }
+            });
+        }
+
+        function removeHighlight(index) {
+            const rows = document.querySelectorAll('.grid');
+            rows.forEach(row => {
+                const cells = row.children;
+                if (cells[index]) {
+                    cells[index].classList.remove('highlight');
+                    cells[index].classList.remove('highlight-tooltip');
+                }
+            });
+        }
+
+        function isLetter(event) {
+            const char = String.fromCharCode(event.which);
+            if (!/[a-zA-Z]/.test(char)) {
+                event.preventDefault();
+            }
+        }
+    </script>
+
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script>
+      function executeGraphic(type) {
+        const zi = parseInt(document.getElementById('zi').value) ?? 0;
+        const luna = parseInt(document.getElementById('luna').value) ?? 0;
+        const an = parseInt(document.getElementById('an').value) ?? 0;
+        if (!isNaN(zi) && !isNaN(luna) && !isNaN(an) && zi > 0 && luna > 0 && an > 0) {
+          let currentYear = new Date().getFullYear()
+          const yArray = (zi * luna * an).toString().split("");
+          const len = yArray.length
+          const xArray = []
+          yArray.forEach((digit, index) => {
+            let years = []
+            for (let i = 0; i <= Math.ceil(100 / len); i++) {
+              years.push(`${an + index + len*i}`)
+            }
+            xArray.push(`<b><i>${yArray[index]}</i></b><br>` + years
+              .map(year =>
+                year == currentYear ? `<b>${year}</b>` : year
+              )
+              .join("<br>")
+            )
+          })
+
+          const data = [{
+            x:xArray,
+            y:yArray,
+            mode: 'lines+markers+text',
+            text: yArray,
+            orientation:"v",
+            marker: {color:"rgba(0,0,255,0.6)"},
+            textposition: 'top',  // positions the text above the points
+            textfont: {
+              color: 'darkred',  // Font color
+            },
+            insidetextanchor: 'start',  // Align text inside the points
+            hoverinfo: 'none',  // Disable hover info to avoid conflict
+            textpadding: 10,  // Padding inside the background
+            line: {
+              dash: 'dot',
+            }
+          }];
+
+          const layout = {
+            height: 700,
+            xaxis: {
+                automargin: true // Ensures the axis margin is adjusted
+            },
+            yaxis: {
+              range: [0, 9.5]
+            },
+            title: {
+                text: `Graficul Energetic ${yArray.join("")}`,
+                x: 0, // Align title to the left (0 is the far left)
+                xanchor: 'left', // Anchor the title to the left side
+                font: {
+                    size: 17, // Set the font size
+                    color: '#000000' // Title color
+                },
+                pad: {
+                  l: 10
+                }
+            },
+            plot_bgcolor: '#e8ecee', // Set the background color of the plot area
+            paper_bgcolor: '#e8ecee', // Set the background color of the entire paper (the entire plot)
+          };
+
+          Plotly.newPlot("myPlot", data, layout);
+
+
+          const vointaDate = (parseInt(`${zi}${luna < 10 ? "0" + luna.toString() : luna}`) * an).toString().split("");
+          const destinDate = (parseInt(`${zi}${luna < 10 ? "1" + luna.toString().replace("0", "1") : luna}`) * an).toString().split("");
+          const vointaX = Array.from({length: vointaDate.length * 2}, (_, i) => i + 1)
+          const destinX = Array.from({length: destinDate.length * 2}, (_, i) => i + 1)
+          const vointaDateFinal = [...vointaDate, ...vointaDate]
+          const destinDateFinal = [...destinDate, ...destinDate]
+
+          const trace1 = {
+            x: vointaX,
+            y: vointaDateFinal,
+            orientation:"v",
+            text: vointaDateFinal,
+            mode: 'lines+markers+text',
+            name: `Vointa ${vointaDate.join("")}`,
+            textposition: 'top',  // positions the text above the points
+            textfont: {
+              color: 'darkred',  // Font color
+            },
+            insidetextanchor: 'start',  // Align text inside the points
+            hoverinfo: 'none',  // Disable hover info to avoid conflict
+            textpadding: 10,  // Padding inside the background
+            line: {
+              dash: 'dashdot',
+            },
+            opacity: 0.8
+          };
+
+          const trace2 = {
+            x: destinX,
+            y: destinDateFinal,
+            orientation:"v",
+            text: destinDateFinal,
+            mode: 'lines+markers+text',
+            name: `Destin ${destinDate.join("")}`,
+            textposition: 'top',  // positions the text above the points
+            textfont: {
+              color: 'darkred',  // Font color
+            },
+            insidetextanchor: 'start',  // Align text inside the points
+            hoverinfo: 'none',  // Disable hover info to avoid conflict
+            textpadding: 10, // Padding inside the background
+            line: {
+              dash: 'dot',
+            },
+            opacity: 0.8
+          };
+
+          const layout2 = {
+            height: 700,
+            xaxis: {
+                automargin: true, // Ensures the axis margin is adjusted
+                tickvals: vointaX,
+                ticktext: destinDateFinal.map((v, index) => an + 12 * index)
+            },
+            yaxis: {
+              range: [0, 9.5]
+            },
+            title: {
+                text: `Graficul Vointa - Destin`,
+                x: 0, // Align title to the left (0 is the far left)
+                xanchor: 'left', // Anchor the title to the left side
+                font: {
+                    size: 17, // Set the font size
+                    color: '#000000' // Title color
+                },
+                pad: {
+                  l: 10
+                }
+            },
+            plot_bgcolor: '#e8ecee', // Set the background color of the plot area
+            paper_bgcolor: '#e8ecee', // Set the background color of the entire paper (the entire plot)
+          };
+
+          Plotly.newPlot("myPlot2", [trace1, trace2], layout2);
+        }
+      }
+    </script>
+</body>
+</html>
