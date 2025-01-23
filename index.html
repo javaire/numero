@@ -116,6 +116,11 @@
         .header-cell {
             font-size: 10px;
             background-color: #f0f0f0;
+            flex-direction: column;
+        }
+
+        .header-cell span.varsta {
+          font-size: 8px;
         }
 
         .bg-1 { background-color: #ffcccc; }
@@ -248,11 +253,11 @@
             }
 
             if (prenume1) {
-                output.innerHTML += `<p></p><div class="computed-name"><b>${prenume1}</b></div><div class="grid">${formatName(prenume1)}</div>`;
+                output.innerHTML += `<p></p><div class="computed-name"><b>Tranzit fizic</b></div><div class="grid">${formatName(prenume1)}</div>`;
             }
 
             if (prenume2) {
-                output.innerHTML += `<p></p><div class="computed-name"><b>${prenume2}</b></div><div class="grid">${formatName(prenume2)}</div>`;
+                output.innerHTML += `<p></p><div class="computed-name"><b>Tranzit mental</b></div><div class="grid">${formatName(prenume2)}</div>`;
             }
 
             if (prenume3) {
@@ -260,13 +265,13 @@
             }
 
             if (nume) {
-                output.innerHTML += `<p></p><div class="computed-name"><b>${nume}</b></div><div class="grid">${formatName(nume)}</div>`;
+                output.innerHTML += `<p></p><div class="computed-name"><b>Tranzit spiritual</b></div><div class="grid">${formatName(nume)}</div>`;
             }
 
             if ((prenume1 || prenume2 || prenume3) && nume) {
                 const combinedValues = combineValues([prenume1, prenume2, prenume3, nume]);
-                output.innerHTML += `<p></p><div class="computed-name">Sumă cifre</div><div class="grid sum-row">${generateSumRow(combinedValues)}</div>`;
-                output.innerHTML += `<p></p><div class="computed-name">Sumă cifre comasate</div><div class="grid reduced-sum-row">${generateReducedSumRow(combinedValues)}</div>`;
+                output.innerHTML += `<p></p><div class="computed-name">Esenta</div><div class="grid sum-row">${generateSumRow(combinedValues)}</div>`;
+                output.innerHTML += `<p></p><div class="computed-name">Esenta</div><div class="grid reduced-sum-row">${generateReducedSumRow(combinedValues)}</div>`;
             }
         }
 
@@ -314,7 +319,7 @@
                 } else {
                     cellClass += ' future-year';
                 }
-                header += `<div class="cell ${cellClass}" onmouseover="highlightColumn(${i})" onmouseout="removeHighlight(${i})">${year}<br />${i}</div>`;
+                header += `<div class="cell ${cellClass}" onmouseover="highlightColumn(${i})" onmouseout="removeHighlight(${i})"><span>${year}</span><span class="varsta">${i}-${i+1}</span></div>`;
             }
             return header;
         }
@@ -470,7 +475,9 @@
                 automargin: true // Ensures the axis margin is adjusted
             },
             yaxis: {
-              range: [0, 9.9]
+              range: [0, 9.9],
+              tick0: 0,          // Starting point of the ticks
+              dtick: 1           // Increment between ticks
             },
             title: {
                 text: `Graficul Energetic ${yArray.join("")}`,
@@ -484,8 +491,8 @@
                   l: 10
                 }
             },
-            plot_bgcolor: '#e8ecee', // Set the background color of the plot area
-            paper_bgcolor: '#e8ecee', // Set the background color of the entire paper (the entire plot)
+            plot_bgcolor: '#f6f1ff', // Set the background color of the plot area
+            paper_bgcolor: '#f6f1ff', // Set the background color of the entire paper (the entire plot)
           };
 
           Plotly.newPlot("myPlot", data, layout);
@@ -546,7 +553,9 @@
                 ticktext: destinDateFinal.map((v, index) => an + 12 * index)
             },
             yaxis: {
-              range: [0, 9.5]
+              range: [0, 9.9],
+              tick0: 0,          // Starting point of the ticks
+              dtick: 1           // Increment between ticks
             },
             title: {
                 text: `Graficul Vointa - Destin`,
@@ -560,8 +569,8 @@
                   l: 10
                 }
             },
-            plot_bgcolor: '#e8ecee', // Set the background color of the plot area
-            paper_bgcolor: '#e8ecee', // Set the background color of the entire paper (the entire plot)
+            plot_bgcolor: '#f6f1ff', // Set the background color of the plot area
+            paper_bgcolor: '#f6f1ff', // Set the background color of the entire paper (the entire plot)
           };
 
           Plotly.newPlot("myPlot2", [trace1, trace2], layout2);
