@@ -498,20 +498,20 @@
           Plotly.newPlot("myPlot", data, layout);
 
 
-          const vointaDate = (parseInt(`${zi}${luna < 10 ? "0" + luna.toString() : luna}`) * an).toString().split("");
+          const soartaDate = (parseInt(`${zi}${luna < 10 ? "0" + luna.toString() : luna}`) * an).toString().split("");
           const destinDate = (parseInt(`${zi}${luna < 10 ? "1" + luna.toString().replace("0", "1") : luna}`) * an).toString().split("");
-          const vointaX = Array.from({length: vointaDate.length * 2}, (_, i) => i + 1)
+          const soartaX = Array.from({length: soartaDate.length * 2}, (_, i) => i + 1)
           const destinX = Array.from({length: destinDate.length * 2}, (_, i) => i + 1)
-          const vointaDateFinal = [...vointaDate, ...vointaDate]
+          const soartaDateFinal = [...soartaDate, ...soartaDate]
           const destinDateFinal = [...destinDate, ...destinDate]
 
           const trace1 = {
-            x: vointaX,
-            y: vointaDateFinal,
+            x: soartaX,
+            y: soartaDateFinal,
             orientation:"v",
-            text: vointaDateFinal,
+            text: soartaDateFinal,
             mode: 'lines+markers+text',
-            name: `Vointa ${vointaDate.join("")}`,
+            name: `Soarta ${soartaDate.join("")}`,
             textposition: 'top',  // positions the text above the points
             textfont: {
               color: 'darkred',  // Font color
@@ -549,7 +549,7 @@
             height: 700,
             xaxis: {
                 automargin: true, // Ensures the axis margin is adjusted
-                tickvals: vointaX,
+                tickvals: soartaX,
                 ticktext: destinDateFinal.map((v, index) => an + 12 * index)
             },
             yaxis: {
@@ -558,7 +558,7 @@
               dtick: 1           // Increment between ticks
             },
             title: {
-                text: `Graficul Vointa - Destin`,
+                text: `Graficul Soarta - Destin`,
                 x: 0, // Align title to the left (0 is the far left)
                 xanchor: 'left', // Anchor the title to the left side
                 font: {
