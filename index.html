@@ -460,6 +460,8 @@
             textposition: 'top',  // positions the text above the points
             textfont: {
               color: 'darkred',  // Font color
+              weight: 'bold',
+              size: 16
             },
             insidetextanchor: 'start',  // Align text inside the points
             hoverinfo: 'none',  // Disable hover info to avoid conflict
@@ -498,8 +500,9 @@
           Plotly.newPlot("myPlot", data, layout);
 
 
-          const soartaDate = (parseInt(`${zi}${luna < 10 ? "0" + luna.toString() : luna}`) * an).toString().split("");
-          const destinDate = (parseInt(`${zi}${luna < 10 ? "1" + luna.toString().replace("0", "1") : luna}`) * an).toString().split("");
+          let soartaDate = (parseInt(`${zi}${luna < 10 ? "0" + luna.toString() : luna}`) * an).toString().split("")
+          soartaDate = soartaDate.length === 6 ? soartaDate.push(soartaDate[0]) : soartaDate
+          const destinDate = (parseInt(`${zi < 10 ? "1" + zi.toString() : zi}${luna < 10 ? "1" + luna.toString() : luna}`) * an).toString().split("")
           const soartaX = Array.from({length: soartaDate.length * 2}, (_, i) => i + 1)
           const destinX = Array.from({length: destinDate.length * 2}, (_, i) => i + 1)
           const soartaDateFinal = [...soartaDate, ...soartaDate]
@@ -515,12 +518,15 @@
             textposition: 'top',  // positions the text above the points
             textfont: {
               color: 'darkred',  // Font color
+              weight: 'bold',
+              size: 16
             },
             insidetextanchor: 'start',  // Align text inside the points
             hoverinfo: 'none',  // Disable hover info to avoid conflict
             textpadding: 10,  // Padding inside the background
             line: {
               dash: 'dashdot',
+              color: 'darkorange'
             },
             opacity: 0.8
           };
@@ -534,13 +540,16 @@
             name: `Destin ${destinDate.join("")}`,
             textposition: 'top',  // positions the text above the points
             textfont: {
-              color: 'darkred',  // Font color
+              color: 'darkblue',  // Font color
+              weight: 'bold',
+              size: 16
             },
             insidetextanchor: 'start',  // Align text inside the points
             hoverinfo: 'none',  // Disable hover info to avoid conflict
             textpadding: 10, // Padding inside the background
             line: {
               dash: 'dot',
+              color: 'darkblue'
             },
             opacity: 0.8
           };
@@ -550,7 +559,9 @@
             xaxis: {
                 automargin: true, // Ensures the axis margin is adjusted
                 tickvals: soartaX,
-                ticktext: destinDateFinal.map((v, index) => an + 12 * index)
+                ticktext: destinDateFinal.map((v, index) => {
+                  return `${(an + 12 * index).toString()}<br><span style="color:gray;">${(12 * index).toString()}</span>`
+                })
             },
             yaxis: {
               range: [0, 9.9],
@@ -571,6 +582,17 @@
             },
             plot_bgcolor: '#f6f1ff', // Set the background color of the plot area
             paper_bgcolor: '#f6f1ff', // Set the background color of the entire paper (the entire plot)
+            legend: {
+                orientation: 'h', // Horizontal layout for the legend
+                x: 0.5, // Center the legend horizontally
+                xanchor: 'center', // Anchor the legend horizontally to its center
+                y: 1.2, // Position the legend above the graphic
+                font: {
+                  family: 'monospace', // Font type for the legend
+                  size: 14, // Larger font size for the legend
+                  color: 'black', // Font color for the legend
+                }
+            }
           };
 
           Plotly.newPlot("myPlot2", [trace1, trace2], layout2);
