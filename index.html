@@ -500,8 +500,10 @@
           Plotly.newPlot("myPlot", data, layout);
 
 
-          let soartaDate = (parseInt(`${zi}${luna < 10 ? "0" + luna.toString() : luna}`) * an).toString().split("")
-          soartaDate = soartaDate.length === 6 ? soartaDate.push(soartaDate[0]) : soartaDate
+          const soartaDate = (parseInt(`${zi}${luna < 10 ? "0" + luna.toString() : luna}`) * an).toString().split("")
+          if (soartaDate.length === 6) {
+            soartaDate.push(soartaDate[0])
+          }
           const destinDate = (parseInt(`${zi < 10 ? "1" + zi.toString() : zi}${luna < 10 ? "1" + luna.toString() : luna}`) * an).toString().split("")
           const soartaX = Array.from({length: soartaDate.length * 2}, (_, i) => i + 1)
           const destinX = Array.from({length: destinDate.length * 2}, (_, i) => i + 1)
