@@ -439,7 +439,7 @@
           const xArray = []
           yArray.forEach((digit, index) => {
             let years = []
-            for (let i = 0; i <= Math.ceil(100 / len); i++) {
+            for (let i = 0; i <= Math.ceil(85 / len); i++) {
               years.push(`${an + index + len*i}`)
             }
             xArray.push(`<b><i>${yArray[index]}</i></b><br>` + years
@@ -508,8 +508,8 @@
           const destinDate = (parseInt(`${zi < 10 ? "1" + zi.toString() : zi}${luna < 10 ? "1" + luna.toString() : luna}`) * an).toString().split("")
           const soartaX = Array.from({length: soartaDate.length * 2}, (_, i) => i + 1)
           const destinX = Array.from({length: destinDate.length * 2}, (_, i) => i + 1)
-          const soartaDateFinal = [...soartaDate, ...soartaDate]
-          const destinDateFinal = [...destinDate, ...destinDate]
+          const soartaDateFinal = [...soartaDate, ...soartaDate[0], ...soartaDate[1]]
+          const destinDateFinal = [...destinDate, ...destinDate[0], ...destinDate[1]]
 
           const trace1 = {
             x: soartaX,
