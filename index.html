@@ -209,14 +209,15 @@
           padding: 5px;
           border: 1px solid #ccc;
           border-radius: 4px;
-          width: 65px;
+          width: 120px;
           text-align: right;
         }
 
         .count-letters-italic {
           color: #aaa;
           font-style: italic;
-          padding-left: 10px;
+          padding-left: 50px;
+          padding-right:7px;
         }
     </style>
 </head>
@@ -288,10 +289,10 @@
                 output.innerHTML += `<p></p><div class="computed-name">Esenta</div><div class="grid sum-row">${generateSumRow(combinedValues)}</div>`;
                 output.innerHTML += `<p></p><div class="computed-name">Esenta</div><div class="grid reduced-sum-row">${generateReducedSumRow(combinedValues)}</div>`;
 
-                const resultLetters = analyzeNames(prenume1, prenume2, prenume3, nume)
-                output.innerHTML += `<p></p><div class="computed-name">Numarul de expresie</div><div class="grid count-letters">${resultLetters['scoreLetters']}</div><div class="grid count-letters-italic"><i>total numar litere: ${resultLetters['totalLetters']}</div>`;
-                output.innerHTML += `<p></p><div class="computed-name">Dorinta inimii</div><div class="grid count-letters">${resultLetters['scoreVowels']}</div><div class="grid count-letters-italic"><i>total numar vocale: ${resultLetters['totalVowels']}</div>`;
-                output.innerHTML += `<p></p><div class="computed-name">Personalitatea</div><div class="grid count-letters">${resultLetters['scoreConsonants']}</div><div class="grid count-letters-italic"><i>total numar consoane: ${resultLetters['totalConsonants']}</div>`;
+                const resultLetters = calculateNameNumerology(prenume1, prenume2, prenume3, nume)
+                output.innerHTML += `<p></p><div class="computed-name">Numarul de expresie</div><div class="grid count-letters">${resultLetters['totalLetters']}</div><div class="grid count-letters-italic">P1</div><div class="grid count-letters">${resultLetters['byName']['prenume1']['scoreLetters']['reduced']}</div><div class="grid count-letters-italic">P2</div><div class="grid count-letters">${resultLetters['byName']['prenume2']['scoreLetters']['reduced']}</div><div class="grid count-letters-italic">P3</div><div class="grid count-letters">${resultLetters['byName']['prenume3']['scoreLetters']['reduced']}</div><div class="grid count-letters-italic">N</div><div class="grid count-letters">${resultLetters['byName']['nume']['scoreLetters']['reduced']}</div>`;
+                output.innerHTML += `<p></p><div class="computed-name">Dorinta inimii</div><div class="grid count-letters">${resultLetters['totalVowels']}</div><div class="grid count-letters-italic">P1</div><div class="grid count-letters">${resultLetters['byName']['prenume1']['scoreVowels']['reduced']}</div><div class="grid count-letters-italic">P2</div><div class="grid count-letters">${resultLetters['byName']['prenume2']['scoreVowels']['reduced']}</div><div class="grid count-letters-italic">P3</div><div class="grid count-letters">${resultLetters['byName']['prenume3']['scoreVowels']['reduced']}</div><div class="grid count-letters-italic">N</div><div class="grid count-letters">${resultLetters['byName']['nume']['scoreVowels']['reduced']}</div>`;
+                output.innerHTML += `<p></p><div class="computed-name">Personalitatea</div><div class="grid count-letters">${resultLetters['totalConsonants']}</div><div class="grid count-letters-italic">P1</div><div class="grid count-letters">${resultLetters['byName']['prenume1']['scoreConsonants']['reduced']}</div><div class="grid count-letters-italic">P2</div><div class="grid count-letters">${resultLetters['byName']['prenume2']['scoreConsonants']['reduced']}</div><div class="grid count-letters-italic">P3</div><div class="grid count-letters">${resultLetters['byName']['prenume3']['scoreConsonants']['reduced']}</div><div class="grid count-letters-italic">N</div><div class="grid count-letters">${resultLetters['byName']['nume']['scoreConsonants']['reduced']}</div>`;
             }
         }
 
@@ -302,59 +303,90 @@
             return (index % 9) + 1;
         }
 
-        function generateAlphabetScores() {
+        function getAlphabetScoreMap() {
             const scores = {};
             let score = 1;
-
             for (let i = 0; i < 26; i++) {
-                const letter = String.fromCharCode(65 + i); // A-Z
+                const letter = String.fromCharCode(65 + i);
                 scores[letter] = score;
-                score++;
-                if (score > 9) score = 1;
+                scores[letter.toLowerCase()] = score;
+                score = score === 9 ? 1 : score + 1;
             }
-
             return scores;
         }
 
-        function analyzeNames(prenume1, prenume2, prenume3, nume) {
-            const allNames = [prenume1, prenume2, prenume3, nume];
-            const vowels = ['A', 'E', 'I', 'O', 'U'];
-            const alphabetScores = generateAlphabetScores();
+        function reduceToNumerologyScoreChain(num) {
+            const parts = [num];
+            while (num > 9) {
+                num = num
+                    .toString()
+                    .split('')
+                    .map(Number)
+                    .reduce((a, b) => a + b, 0);
+                parts.push(num);
+            }
+            return parts.length === 1 ? `${num}` : parts.join(' / ');
+        }
 
-            let totalLetters = 0;
-            let totalVowels = 0;
-            let totalConsonants = 0;
+        function calculateNameNumerology(prenume1, prenume2, prenume3, nume) {
+            const vowels = 'aeiouAEIOU';
+            const alphabetScores = getAlphabetScoreMap();
 
-            let scoreLetters = 0;
-            let scoreVowels = 0;
-            let scoreConsonants = 0;
+            const names = { prenume1, prenume2, prenume3, nume };
+            const byName = {};
 
-            for (const raw of allNames) {
-                const name = (raw || '').toUpperCase().replace(/[^A-Z]/g, '');
+            for (const [key, value] of Object.entries(names)) {
+                const chars = value.replace(/[^a-zA-Z]/g, '').split('');
 
-                for (const char of name) {
-                    totalLetters++;
-                    const charScore = alphabetScores[char] || 0;
-                    scoreLetters += charScore;
+                const scoreLetters = chars.reduce((sum, ch) => sum + alphabetScores[ch], 0);
+                const scoreVowels = chars
+                    .filter(ch => vowels.includes(ch))
+                    .reduce((sum, ch) => sum + alphabetScores[ch], 0);
+                const scoreConsonants = chars
+                    .filter(ch => !vowels.includes(ch))
+                    .reduce((sum, ch) => sum + alphabetScores[ch], 0);
 
-                    if (vowels.includes(char)) {
-                        totalVowels++;
-                        scoreVowels += charScore;
-                    } else {
-                        totalConsonants++;
-                        scoreConsonants += charScore;
+                byName[key] = {
+                    scoreLetters: {
+                        raw: scoreLetters,
+                        reduced: reduceToNumerologyScoreChain(scoreLetters).replace("11", "<b>11</b>").replace("22", "<b>22</b>")
+                    },
+                    scoreVowels: {
+                        raw: scoreVowels,
+                        reduced: reduceToNumerologyScoreChain(scoreVowels).replace("11", "<b>11</b>").replace("22", "<b>22</b>")
+                    },
+                    scoreConsonants: {
+                        raw: scoreConsonants,
+                        reduced: reduceToNumerologyScoreChain(scoreConsonants).replace("11", "<b>11</b>").replace("22", "<b>22</b>")
                     }
-                }
+                };
             }
 
-            return {
-                totalLetters,
-                totalVowels,
-                totalConsonants,
-                scoreLetters,
-                scoreVowels,
-                scoreConsonants
+            // Calculate totals as sum of reduced numeric values
+            const totalLettersVal =
+                Object.values(byName).reduce((acc, val) => {
+                    const reduced = +val.scoreLetters.reduced.split(' / ').at(-1);
+                    return acc + reduced;
+                }, 0);
+            const totalVowelsVal =
+                Object.values(byName).reduce((acc, val) => {
+                    const reduced = +val.scoreVowels.reduced.split(' / ').at(-1);
+                    return acc + reduced;
+                }, 0);
+            const totalConsonantsVal =
+                Object.values(byName).reduce((acc, val) => {
+                    const reduced = +val.scoreConsonants.reduced.split(' / ').at(-1);
+                    return acc + reduced;
+                }, 0);
+
+            const result = {
+                byName,
+                totalLetters: reduceToNumerologyScoreChain(totalLettersVal).replace("11", "<b>11</b>").replace("22", "<b>22</b>"),
+                totalVowels: reduceToNumerologyScoreChain(totalVowelsVal).replace("11", "<b>11</b>").replace("22", "<b>22</b>"),
+                totalConsonants: reduceToNumerologyScoreChain(totalConsonantsVal).replace("11", "<b>11</b>").replace("22", "<b>22</b>")
             };
+
+            return result;
         }
 
         function formatName(name) {
