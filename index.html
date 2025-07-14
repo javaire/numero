@@ -203,6 +203,21 @@
         .js-plotly-plot .plotly .main-svg {
           border-radius: 5px;
         }
+
+        .count-letters {
+          background-color: #ffffcc;
+          padding: 5px;
+          border: 1px solid #ccc;
+          border-radius: 4px;
+          width: 65px;
+          text-align: right;
+        }
+
+        .count-letters-italic {
+          color: #aaa;
+          font-style: italic;
+          padding-left: 10px;
+        }
     </style>
 </head>
 <body>
@@ -272,6 +287,11 @@
                 const combinedValues = combineValues([prenume1, prenume2, prenume3, nume]);
                 output.innerHTML += `<p></p><div class="computed-name">Esenta</div><div class="grid sum-row">${generateSumRow(combinedValues)}</div>`;
                 output.innerHTML += `<p></p><div class="computed-name">Esenta</div><div class="grid reduced-sum-row">${generateReducedSumRow(combinedValues)}</div>`;
+
+                const resultLetters = analyzeNames(prenume1, prenume2, prenume3, nume)
+                output.innerHTML += `<p></p><div class="computed-name">Numarul de expresie</div><div class="grid count-letters">${resultLetters['scoreLetters']}</div><div class="grid count-letters-italic"><i>total numar litere: ${resultLetters['totalLetters']}</div>`;
+                output.innerHTML += `<p></p><div class="computed-name">Dorinta inimii</div><div class="grid count-letters">${resultLetters['scoreVowels']}</div><div class="grid count-letters-italic"><i>total numar vocale: ${resultLetters['totalVowels']}</div>`;
+                output.innerHTML += `<p></p><div class="computed-name">Personalitatea</div><div class="grid count-letters">${resultLetters['scoreConsonants']}</div><div class="grid count-letters-italic"><i>total numar consoane: ${resultLetters['totalConsonants']}</div>`;
             }
         }
 
@@ -280,6 +300,61 @@
             const index = alphabet.indexOf(char.toUpperCase());
             if (index === -1) return 1;
             return (index % 9) + 1;
+        }
+
+        function generateAlphabetScores() {
+            const scores = {};
+            let score = 1;
+
+            for (let i = 0; i < 26; i++) {
+                const letter = String.fromCharCode(65 + i); // A-Z
+                scores[letter] = score;
+                score++;
+                if (score > 9) score = 1;
+            }
+
+            return scores;
+        }
+
+        function analyzeNames(prenume1, prenume2, prenume3, nume) {
+            const allNames = [prenume1, prenume2, prenume3, nume];
+            const vowels = ['A', 'E', 'I', 'O', 'U'];
+            const alphabetScores = generateAlphabetScores();
+
+            let totalLetters = 0;
+            let totalVowels = 0;
+            let totalConsonants = 0;
+
+            let scoreLetters = 0;
+            let scoreVowels = 0;
+            let scoreConsonants = 0;
+
+            for (const raw of allNames) {
+                const name = (raw || '').toUpperCase().replace(/[^A-Z]/g, '');
+
+                for (const char of name) {
+                    totalLetters++;
+                    const charScore = alphabetScores[char] || 0;
+                    scoreLetters += charScore;
+
+                    if (vowels.includes(char)) {
+                        totalVowels++;
+                        scoreVowels += charScore;
+                    } else {
+                        totalConsonants++;
+                        scoreConsonants += charScore;
+                    }
+                }
+            }
+
+            return {
+                totalLetters,
+                totalVowels,
+                totalConsonants,
+                scoreLetters,
+                scoreVowels,
+                scoreConsonants
+            };
         }
 
         function formatName(name) {
